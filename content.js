@@ -73,3 +73,29 @@ new MutationObserver(() => {
     setTimeout(processMessages, 500);
   }
 }).observe(document, { subtree: true, childList: true });
+
+// Add global event handler for Shift+ESC to focus chat box
+document.addEventListener('keydown', (event) => {
+  if (event.shiftKey && event.key === 'Escape') {
+    // Find the chat input box using multiple selectors for robustness
+    const chatInput = document.querySelector('.ProseMirror[role="textbox"]') || 
+                     document.querySelector('.ProseMirror[contenteditable="true"]') ||
+                     document.querySelector('[contenteditable="true"][role="textbox"]');
+    
+    if (chatInput && document.activeElement !== chatInput) {
+      event.preventDefault();
+      chatInput.focus();
+      
+      // Move cursor to the end of the content
+      const selection = window.getSelection();
+      const range = document.createRange();
+      
+      // Select all content and collapse to end
+      range.selectNodeContents(chatInput);
+      range.collapse(false);
+      
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+});
